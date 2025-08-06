@@ -1,5 +1,5 @@
-import { PropsWithChildren, useState } from 'react';
-import { StyleSheet, TouchableOpacity } from 'react-native';
+import { PropsWithChildren, useCallback, useState } from 'react';
+import { Button, StyleSheet, TouchableOpacity } from 'react-native';
 
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
@@ -7,39 +7,63 @@ import { IconSymbol } from '@/components/ui/IconSymbol';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 
-export function Collapsible({ children, title }: PropsWithChildren & { title: string }) {
-  const [isOpen, setIsOpen] = useState(false);
-  const theme = useColorScheme() ?? 'light';
+type CollapsibleProps = PropsWithChildren
+	& {
+		title: string,
+		onExpand?: () => void,
+		onConfirm?: () => void,
+		showConfirmButton?: boolean,
+		confirmButtonTitle?: string,
+	}
 
-  return (
-    <ThemedView>
-      <TouchableOpacity
-        style={styles.heading}
-        onPress={() => setIsOpen((value) => !value)}
-        activeOpacity={0.8}>
-        <IconSymbol
-          name="chevron.right"
-          size={18}
-          weight="medium"
-          color={theme === 'light' ? Colors.light.icon : Colors.dark.icon}
-          style={{ transform: [{ rotate: isOpen ? '90deg' : '0deg' }] }}
-        />
+export const Collapsible = ({ children, title, onExpand, onConfirm, showConfirmButton, confirmButtonTitle }: CollapsibleProps) => {
+	const [isOpen, setIsOpen] = useState(false);
+	const theme = useColorScheme() ?? 'light';
+	const confirm = useCallback(() => {
+		setIsOpen(false);
+		onConfirm && onConfirm();
+	}, [])
 
-        <ThemedText type="defaultSemiBold">{title}</ThemedText>
-      </TouchableOpacity>
-      {isOpen && <ThemedView style={styles.content}>{children}</ThemedView>}
-    </ThemedView>
-  );
+	return (
+		<ThemedView>
+			<TouchableOpacity
+				style={styles.heading}
+				onPress={() => {
+					setIsOpen((value) => !value);
+					if (isOpen && onExpand) {
+						onExpand();
+					}
+				}}
+				activeOpacity={0.8}>
+				<IconSymbol
+					name="chevron.right"
+					size={18}
+					weight="medium"
+					color={theme === 'light' ? Colors.light.icon : Colors.dark.icon}
+					style={{ transform: [{ rotate: isOpen ? '90deg' : '0deg' }] }}
+				/>
+
+				<ThemedText type="defaultSemiBold">{title}</ThemedText>
+			</TouchableOpacity>
+			{isOpen && <ThemedView style={styles.content}>{children}</ThemedView>}
+			{showConfirmButton && isOpen &&
+				<Button
+					title={confirmButtonTitle || 'Confirm'}
+					onPress={() => confirm()} />
+			}
+
+		</ThemedView>
+	);
 }
 
 const styles = StyleSheet.create({
-  heading: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-  content: {
-    marginTop: 6,
-    marginLeft: 24,
-  },
+	heading: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		gap: 6,
+	},
+	content: {
+		marginTop: 6,
+		marginLeft: 24,
+	},
 });
