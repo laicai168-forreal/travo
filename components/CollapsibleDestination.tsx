@@ -1,5 +1,5 @@
 import { PropsWithChildren, useCallback, useState } from 'react';
-import { Button, StyleSheet, TouchableOpacity } from 'react-native';
+import { StyleSheet, TouchableOpacity } from 'react-native';
 
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
@@ -7,6 +7,7 @@ import { IconSymbol } from '@/components/ui/IconSymbol';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { PlanRequestItem } from '@/store/reducers/planReducer';
+import { InlineTimePicker } from './InlineTimePicker';
 import { ThemedTextInput } from './ThemedTextInput';
 
 type CollapsibleDestinationProps = PropsWithChildren
@@ -15,84 +16,169 @@ type CollapsibleDestinationProps = PropsWithChildren
 		planRequestItem: PlanRequestItem,
 		onExpand?: () => void,
 		onConfirm?: (planRequestItem: PlanRequestItem) => void,
+		onRemove?: (key: string) => void,
 		showConfirmButton?: boolean,
 		confirmButtonTitle?: string,
+		isOpenDefault?: boolean,
 	}
 
-export const CollapsibleDestination = ({ children, title, onExpand, onConfirm, showConfirmButton, confirmButtonTitle, planRequestItem, }: CollapsibleDestinationProps) => {
-	const [isOpen, setIsOpen] = useState(false);
-	const [editingPlanItem, setEditingPlanItem] = useState({ ...planRequestItem })
+export const CollapsibleDestination = ({
+	children,
+	title,
+	showConfirmButton,
+	confirmButtonTitle,
+	planRequestItem,
+	isOpenDefault = false,
+	onExpand,
+	onRemove,
+	onConfirm,
+}: CollapsibleDestinationProps) => {
+	const [isOpen, setIsOpen] = useState(isOpenDefault);
+	const [editingPlanItem, setEditingPlanItem] = useState<PlanRequestItem>({ ...planRequestItem })
 	const theme = useColorScheme() ?? 'light';
-	const confirm = useCallback(() => {
+	const handleConfirm = useCallback(() => {
 		setIsOpen(false);
 		onConfirm && onConfirm(editingPlanItem);
+	}, [editingPlanItem]);
+
+	const handleRemove = useCallback(() => {
+		onRemove && editingPlanItem && onRemove(editingPlanItem.key);
 	}, [editingPlanItem])
 
-	return (
-		<ThemedView>
-			<TouchableOpacity
-				style={styles.heading}
-				onPress={() => {
-					setIsOpen((value) => !value);
-					if (isOpen && onExpand) {
-						onExpand();
-					}
-				}}
-				activeOpacity={0.8}>
-				<IconSymbol
-					name="chevron.right"
-					size={18}
-					weight="medium"
-					color={theme === 'light' ? Colors.light.icon : Colors.dark.icon}
-					style={{ transform: [{ rotate: isOpen ? '90deg' : '0deg' }] }}
-				/>
+	const handleToggle = useCallback(() => {
+		setIsOpen((value) => !value);
+		if (isOpen && onExpand) {
+			onExpand();
+		}
+	}, []);
 
-				<ThemedText type="defaultSemiBold">{title}</ThemedText>
+	const handleDestinationChange = useCallback((destination: string) => {
+		if (destination) {
+			setEditingPlanItem({...editingPlanItem, destination})
+		}
+	}, [editingPlanItem]);
+
+	const handleStartTimeChange = useCallback((selectedDate?: Date) => {
+		if (selectedDate) {
+			setEditingPlanItem({...editingPlanItem, startTime: selectedDate.toString()})
+		}
+	}, [editingPlanItem]);
+
+	const handleEndTimeChange = useCallback((selectedDate?: Date) => {
+		if (selectedDate) {
+			setEditingPlanItem({...editingPlanItem, endTime: selectedDate.toString()})
+		}
+	}, [editingPlanItem]);
+
+	
+
+	return (
+		<ThemedView style={styles.container}>
+			<TouchableOpacity
+				onPress={() => handleToggle()}
+				style={styles.heading}
+				activeOpacity={0.8}>
+				<ThemedView style={styles.row}>
+					<ThemedText type="defaultSemiBold" style={styles.titleText}>{title}</ThemedText>
+					<ThemedView style={styles.symbolWrapper}>
+						<IconSymbol
+							name="chevron.right"
+							size={18}
+							weight="medium"
+							color={theme === 'light' ? Colors.light.icon : Colors.dark.icon}
+							style={{ transform: [{ rotate: isOpen ? '90deg' : '0deg' }] }}
+						/>
+					</ThemedView>
+				</ThemedView>
 			</TouchableOpacity>
 			{isOpen && <ThemedView style={styles.content}>{children}</ThemedView>}
 			{isOpen && editingPlanItem && <>
 				<ThemedView style={styles.row}>
-					<ThemedText type="defaultSemiBold">DESTINATION: </ThemedText>
-					<ThemedText>
-						<ThemedTextInput
-							placeholder='add a destination'
-							value={editingPlanItem.destination}
-							onChangeText={des => setEditingPlanItem({ ...editingPlanItem, destination: des })}
-						/>
-					</ThemedText>
+					{/* <ThemedText style={styles.labelText}>DESTINATION </ThemedText> */}
+					<ThemedTextInput
+						style={styles.inputText}
+						keyboardType='default'
+						placeholder='add a destination'
+						value={editingPlanItem.destination}
+						onChangeText={handleDestinationChange}
+					/>
 				</ThemedView>
 				<ThemedView style={styles.row}>
-					<ThemedText type="defaultSemiBold">TIME: </ThemedText>
-					<ThemedText>FROM:</ThemedText>
-					<ThemedText>
-						<ThemedTextInput
-							placeholder='starting time'
-							value={editingPlanItem.startTime}
-						/>
-					</ThemedText>
-					<ThemedText>TO:</ThemedText>
-					<ThemedText>
-						<ThemedTextInput
-							placeholder='ending time'
-							value={editingPlanItem.endTime} />
-					</ThemedText>
+					{/* TODO: will be replaced by datetime picker */}
+					{/* <ThemedText type="defaultSemiBold" style={styles.labelText}>TIME </ThemedText> */}
+					<ThemedView style={styles.timeWrapper}>
+						<ThemedView style={styles.timeItemWrapper}>
+							<ThemedText style={styles.labelText}>FROM</ThemedText>
+							<InlineTimePicker 
+								showTime={true}
+								timeValue={editingPlanItem.startTime} 
+								containerStyle={styles.timePickerContainer} 
+								onTimeChange={handleStartTimeChange}/>
+						</ThemedView>
+						<ThemedView style={styles.timeItemWrapper}>
+							<ThemedText style={styles.labelText}>TO</ThemedText>
+							<InlineTimePicker 
+								minimumDate={editingPlanItem.startTime}
+								showTime={true}
+								timeValue={editingPlanItem.endTime}  
+								containerStyle={styles.timePickerContainer} 
+								onTimeChange={handleEndTimeChange}/>
+						</ThemedView>
+					</ThemedView>
 				</ThemedView>
-				{showConfirmButton && isOpen &&
-					<Button
-						title={confirmButtonTitle || 'Confirm'}
-						onPress={() => confirm()} />
+				{showConfirmButton &&
+					<ThemedView style={[styles.row, styles.buttonRow]}>
+						<ThemedText style={styles.removeButton} onPress={() => handleRemove()}>Remove</ThemedText>
+						<ThemedText style={styles.confirmButton} onPress={() => handleConfirm()}>{confirmButtonTitle || 'Confirm'}</ThemedText>
+					</ThemedView>
 				}
 			</>}
-
-
-
-		</ThemedView>
+		</ThemedView >
 	);
 }
 
 const styles = StyleSheet.create({
+	container: {
+		width: '100%',
+	},
+	titleText: {
+		flexGrow: 1,
+		fontWeight: 500,
+		fontSize: 18,
+	},
+	symbolWrapper: {
+		flexDirection: 'row',
+		verticalAlign: 'middle',
+	},
 	row: {
 		flexDirection: 'row',
+		width: '100%',
+		padding: 15,
+		borderTopColor: '#E6E6E6',
+		borderTopWidth: 1,
+	},
+	labelText: {
+		fontSize: 15,
+		fontWeight: 500,
+		width: '15%',
+	},
+	timeWrapper: {
+		flexDirection: 'column',
+		flexGrow: 1,
+	},
+	timeItemWrapper: {
+		flexDirection: 'row',
+		paddingBottom: 10,
+		alignItems: 'center',
+	},
+	timePickerContainer: {
+		width: '70%',
+	},
+	inputText: {
+		flexGrow: 1,
+	},
+	buttonRow: {
+		justifyContent: 'center',
 	},
 	heading: {
 		flexDirection: 'row',
@@ -100,7 +186,15 @@ const styles = StyleSheet.create({
 		gap: 6,
 	},
 	content: {
-		marginTop: 6,
 		marginLeft: 24,
 	},
+	removeButton: {
+		color: '#F75959',
+		width: '50%',
+		textAlign: 'center'
+	},
+	confirmButton: {
+		width: '50%',
+		textAlign: 'center'
+	}
 });
