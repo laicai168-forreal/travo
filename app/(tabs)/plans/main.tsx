@@ -1,9 +1,11 @@
 
 
-import { SafeAreaView, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
+import { SafeAreaView, ScrollView, StyleSheet } from 'react-native';
 
+import { ActionButton } from '@/components/ActionButton';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import t from '@/constants/Translations';
 import { AppDispatch, RootState } from '@/store/store';
 import { useRouter } from 'expo-router';
 import { useDispatch, useSelector } from 'react-redux';
@@ -18,15 +20,11 @@ export default function PlanMainScreen() {
         <SafeAreaView style={styles.container}>
             <ScrollView style={styles.topContainer}>
                 <ThemedView style={styles.titleContainer}>
-                    <ThemedText style={styles.titleText} type="defaultSemiBold">TRAVELS</ThemedText>
+                    <ThemedText style={styles.titleText} type="defaultSemiBold">Travels</ThemedText>
                 </ThemedView>
             </ScrollView>
             <ThemedView style={styles.stickyBottomContainer}>
-                <TouchableOpacity style={styles.themedButton} disabled={isLoading} onPress={() => router.push('/(tabs)/plans/edit')}>
-                    <ThemedText style={styles.themedButtonText}>
-                        ADD NEW TRAVEL
-                    </ThemedText>
-                </TouchableOpacity>
+                <ActionButton title={t.plan.addTravel[language]} onPress={() => router.push('/(tabs)/plans/edit')} />
             </ThemedView>
         </SafeAreaView >
     );
@@ -70,22 +68,9 @@ const styles = StyleSheet.create({
         color: '#777',
         padding: 15,
         borderTopColor: '#E6E6E6',
-		borderTopWidth: 1,
+        borderTopWidth: 1,
     },
     addDestinationButtonDisabled: {
-        textAlign: 'center',
-    },
-    //TODO: will move this to a shared component
-    themedButton: {
-        borderRadius: 6,
-        backgroundColor: '#333',
-        marginHorizontal: 40,
-        padding: 15,
-    },
-    themedButtonText: {
-        fontSize: 18,
-        fontWeight: 700,
-        color: '#eee',
         textAlign: 'center',
     },
     reactLogo: {

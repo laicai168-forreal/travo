@@ -8,13 +8,13 @@ export type ThemedTextInputProps = TextInputProps & {
   type?: 'default' | 'title' | 'defaultSemiBold' | 'subtitle' | 'link';
 };
 
-export function ThemedTextInput({
+export const ThemedTextInput = ({
   style,
   lightColor,
   darkColor,
   type = 'default',
   ...rest
-}: ThemedTextInputProps) {
+}: ThemedTextInputProps) => {
   const color = useThemeColor({ light: lightColor, dark: darkColor }, 'text');
 
   return (

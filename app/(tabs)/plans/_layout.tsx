@@ -12,6 +12,7 @@ export default function PlanLayout() {
             <Stack>
                 <Stack.Screen name="main" options={{ headerShown: false }} />
                 <Stack.Screen name="edit" options={{ headerShown: false }} />
+                <Stack.Screen name="result" options={{ headerShown: false }} />
             </Stack>
             <StatusBar style="auto" />
         </>

@@ -3,58 +3,47 @@
 import { SafeAreaView, ScrollView, StyleSheet } from 'react-native';
 
 import { ActionButton } from '@/components/ActionButton';
-import { CollapsibleDestination } from '@/components/CollapsibleDestination';
-import { LoadingIndicator } from '@/components/LoadingIndicator';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import t from '@/constants/Translations';
-import { addEmptyDestination, getPlanV1, PlanRequestItem, removeDestination, updateDestination } from '@/store/reducers/planReducer';
 import { AppDispatch, RootState } from '@/store/store';
 import { useRouter } from 'expo-router';
-import { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-export default function PlanEditScreen() {
+export default function PlanResultScreen() {
     const router = useRouter();
     const isLoading = useSelector((state: RootState) => state.planData.loading);
+    const currentPlan = useSelector((state: RootState) => state.planData.currentPlan);
     const language = useSelector((state: RootState) => state.settings.language);
-    const planRequest = useSelector((state: RootState) => state.planData.planRequest);
-
-    const handleDestinationConfirmation = useCallback((editingPlanItem: PlanRequestItem) => {
-        dispatch(updateDestination({ ...editingPlanItem }))
-    }, [])
-
-    const handleGetPlanButtonPress = useCallback(() => {
-        dispatch(getPlanV1(planRequest))
-            .then(() => router.push('/(tabs)/plans/result'))
-    }, [planRequest])
-
     const dispatch = useDispatch<AppDispatch>();
 
     return (
         <SafeAreaView style={styles.container}>
-            {isLoading && <LoadingIndicator />}
             <ScrollView style={styles.topContainer}>
                 <ThemedView style={styles.titleContainer}>
-                    <ThemedText style={styles.titleText} type="defaultSemiBold">Plan your travel</ThemedText>
+                    <ThemedText style={styles.titleText} type="defaultSemiBold">Schedule</ThemedText>
                 </ThemedView>
-                <ThemedView style={styles.stepContainer}>
-                    {planRequest.map((planReq, index) => <ThemedText key={index}>
-                        <CollapsibleDestination
-                            planRequestItem={planReq}
-                            title={planReq.destination ? planReq.destination : 'Edit Destination'}
-                            showConfirmButton={true}
-                            isOpenDefault={true}
-                            confirmButtonTitle='Confirm Destination'
-                            onRemove={() => dispatch(removeDestination(planReq.key))}
-                            onConfirm={handleDestinationConfirmation}>
-                        </CollapsibleDestination>
-                    </ThemedText>)}
-                    <ThemedText style={styles.addDestinationButton} onPress={() => dispatch(addEmptyDestination())}>+ ADD A DESTINATION</ThemedText>
+                <ThemedView>
+
                 </ThemedView>
+                {!isLoading && currentPlan.map((plan, index) => <ThemedView key={index}>
+                    <ThemedView style={styles.row}>
+                        <ThemedText style={styles.location}>{plan.destination}</ThemedText>
+                    </ThemedView>
+                    {plan.days.map((dayPlan, index) => <ThemedView key={index}>
+                        <ThemedView style={styles.row}>
+                            <ThemedText style={styles.date}>{dayPlan.date}</ThemedText>
+                        </ThemedView>
+                        {dayPlan.schedule.map((timePlan, index) => <ThemedView style={styles.timePlanContainer} key={index}>
+                            <ThemedText style={styles.timeText}>{timePlan.time} at {timePlan.location}, {timePlan.action}.</ThemedText>
+                            {/* image is not working */}
+                            {/* <Image source={{ uri: timePlan.image }} placeholder={'Loading...'} style={{ height: 150, width: 150 }} /> */}
+                        </ThemedView>)}
+                    </ThemedView>)}
+                </ThemedView>)}
             </ScrollView>
-            <ThemedView style={styles.stickyBottomContainer} >
-                <ActionButton title={t.plan.getAPlan[language]} onPress={handleGetPlanButtonPress} />
+            <ThemedView style={styles.stickyBottomContainer}>
+                <ActionButton title={t.plan.save[language]} onPress={() => router.push('/(tabs)/plans/main')} />
             </ThemedView>
         </SafeAreaView >
     );
@@ -63,11 +52,27 @@ export default function PlanEditScreen() {
 const styles = StyleSheet.create({
     row: {
         flexDirection: 'row',
+        padding: 8,
+    },
+    location: {
+        fontSize: 19,
+        fontWeight: 500,
     },
     container: {
         flexDirection: 'column',
         flex: 1,
         backgroundColor: '#ffffff'
+    },
+    date: {
+        fontWeight: 500,
+    },
+    timePlanContainer: {
+        paddingVertical: 8,
+        paddingLeft: 16
+    },
+    timeText: {
+        fontSize: 15,
+        color: '#444'
     },
     topContainer: {
         flex: 1,
@@ -98,7 +103,7 @@ const styles = StyleSheet.create({
         color: '#777',
         padding: 15,
         borderTopColor: '#E6E6E6',
-		borderTopWidth: 1,
+        borderTopWidth: 1,
     },
     addDestinationButtonDisabled: {
         textAlign: 'center',
@@ -115,5 +120,12 @@ const styles = StyleSheet.create({
         fontWeight: 700,
         color: '#eee',
         textAlign: 'center',
+    },
+    reactLogo: {
+        height: 178,
+        width: 290,
+        bottom: 0,
+        left: 0,
+        position: 'absolute',
     },
 });

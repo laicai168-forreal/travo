@@ -1,4 +1,4 @@
-import { PropsWithChildren, useCallback, useState } from 'react';
+import { PropsWithChildren, useCallback, useEffect, useState } from 'react';
 import { StyleSheet, TouchableOpacity } from 'react-native';
 
 import { ThemedText } from '@/components/ThemedText';
@@ -36,6 +36,11 @@ export const CollapsibleDestination = ({
 	const [isOpen, setIsOpen] = useState(isOpenDefault);
 	const [editingPlanItem, setEditingPlanItem] = useState<PlanRequestItem>({ ...planRequestItem })
 	const theme = useColorScheme() ?? 'light';
+
+	useEffect(() => {
+		setEditingPlanItem(planRequestItem);
+	}, [planRequestItem])
+
 	const handleConfirm = useCallback(() => {
 		setIsOpen(false);
 		onConfirm && onConfirm(editingPlanItem);
@@ -70,8 +75,6 @@ export const CollapsibleDestination = ({
 		}
 	}, [editingPlanItem]);
 
-	
-
 	return (
 		<ThemedView style={styles.container}>
 			<TouchableOpacity
@@ -94,7 +97,6 @@ export const CollapsibleDestination = ({
 			{isOpen && <ThemedView style={styles.content}>{children}</ThemedView>}
 			{isOpen && editingPlanItem && <>
 				<ThemedView style={styles.row}>
-					{/* <ThemedText style={styles.labelText}>DESTINATION </ThemedText> */}
 					<ThemedTextInput
 						style={styles.inputText}
 						keyboardType='default'
@@ -104,11 +106,9 @@ export const CollapsibleDestination = ({
 					/>
 				</ThemedView>
 				<ThemedView style={styles.row}>
-					{/* TODO: will be replaced by datetime picker */}
-					{/* <ThemedText type="defaultSemiBold" style={styles.labelText}>TIME </ThemedText> */}
 					<ThemedView style={styles.timeWrapper}>
 						<ThemedView style={styles.timeItemWrapper}>
-							<ThemedText style={styles.labelText}>FROM</ThemedText>
+							<ThemedText style={styles.labelText}>From</ThemedText>
 							<InlineTimePicker 
 								showTime={true}
 								timeValue={editingPlanItem.startTime} 
@@ -116,7 +116,7 @@ export const CollapsibleDestination = ({
 								onTimeChange={handleStartTimeChange}/>
 						</ThemedView>
 						<ThemedView style={styles.timeItemWrapper}>
-							<ThemedText style={styles.labelText}>TO</ThemedText>
+							<ThemedText style={styles.labelText}>To</ThemedText>
 							<InlineTimePicker 
 								minimumDate={editingPlanItem.startTime}
 								showTime={true}
@@ -143,8 +143,8 @@ const styles = StyleSheet.create({
 	},
 	titleText: {
 		flexGrow: 1,
-		fontWeight: 500,
-		fontSize: 18,
+		fontWeight: 400,
+		fontSize: 16,
 	},
 	symbolWrapper: {
 		flexDirection: 'row',
@@ -159,7 +159,7 @@ const styles = StyleSheet.create({
 	},
 	labelText: {
 		fontSize: 15,
-		fontWeight: 500,
+		fontWeight: 400,
 		width: '15%',
 	},
 	timeWrapper: {

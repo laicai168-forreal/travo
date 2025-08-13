@@ -117,8 +117,8 @@ const getPlanFromAI = async (request: PlanRequestItem[]) => {
     }
 }
 
+//TODO: Will remove this later
 const getPlanFromAIMock = async (request: PlanRequestItem[]) => {
-
     const apiRequest = (): Promise<DestinationPlan[]> => {
         return new Promise((resolve) => {
             setTimeout(() => { resolve(mockPlans) }, 2000);
@@ -131,8 +131,6 @@ const getPlanFromAIMock = async (request: PlanRequestItem[]) => {
     } else {
         throw 'no destination';
     }
-
-
 }
 
 export const getPlanV1 = createAsyncThunk('plan/getPlanV1', async (request: PlanRequestItem[]) => {
@@ -165,6 +163,10 @@ const initiatePlanDataAction = (state: PlanData) => {
     state.currentPlan = [];
 }
 
+const removeDestinationAction = (state: PlanData, action: PayloadAction<string>) => {
+    state.planRequest = [...state.planRequest.filter(req => req.key !== action.payload)];
+}
+
 const getPlanV1Builder = (builder: ActionReducerMapBuilder<PlanData>) => {
     return builder
         .addCase(getPlanV1.pending, state => {
@@ -188,7 +190,8 @@ const planDataSlice = createSlice({
     reducers: {
         initiatePlanData: initiatePlanDataAction,
         addEmptyDestination: addEmptyDestinationAction,
-        updateDestination: updateDestinationAction
+        updateDestination: updateDestinationAction,
+        removeDestination: removeDestinationAction,
     },
     extraReducers: builder => {
         getPlanV1Builder(builder);
@@ -200,6 +203,7 @@ const planDataReducer = planDataSlice.reducer;
 export const {
     initiatePlanData,
     addEmptyDestination,
-    updateDestination
+    updateDestination,
+    removeDestination
 } = planDataSlice.actions;
 export default planDataReducer;
