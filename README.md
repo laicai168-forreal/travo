@@ -4,6 +4,14 @@ We are having this idea to help all travellers to get a quick travel plan and sc
 
 Now we are using the OpenAI queries at frontend for testing purposes. We will start working on the backend soon. And we will move the data query and handling to the backend.
 
+<img width="200" alt="Image" src="https://github.com/user-attachments/assets/aad65a62-09a4-439e-91bb-68d875c8fa4c" />
+
+<img width="200" alt="Image" src="https://github.com/user-attachments/assets/707da8fd-a14c-42c6-80c9-78492cebc647" />
+
+<img width="200" alt="Image" src="https://github.com/user-attachments/assets/44cdc6c9-5139-49bf-8da3-0c52ede34a2c" />
+
+<img width="200" alt="Image" src="https://github.com/user-attachments/assets/25a624da-1a1b-42da-8c3e-ac487ba9ccbe" />
+
 ## Phase 1
 
 Our phase one will be pretty light weight.
