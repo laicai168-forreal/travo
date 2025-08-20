@@ -10,7 +10,7 @@ Now we are using the OpenAI queries at frontend for testing purposes. We will st
 
 <img width="200" alt="Image" src="https://github.com/user-attachments/assets/44cdc6c9-5139-49bf-8da3-0c52ede34a2c" />
 
-<img width="200" alt="Image" src="https://github.com/user-attachments/assets/25a624da-1a1b-42da-8c3e-ac487ba9ccbe" />
+<img width="200" alt="Image" src="https://github.com/user-attachments/assets/715d4959-97fd-4cd5-b833-53988a22e076" />
 
 ## Phase 1
 
