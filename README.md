@@ -1,4 +1,4 @@
-# Welcome to Travo 👋
+# Welcome to Travo 👋 AI Powered Plan Helper
 
 We are having this idea to help all travellers to get a quick travel plan and schedule with the help of AI. Usually the user will just need to add the destinations and the date/time with a click of the the button "Get a plan" to generate a helpful schedule. All he needs to do next is to follow the schedule. This repository is created for frontend application.
 
